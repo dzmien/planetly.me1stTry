@@ -1,26 +1,11 @@
 Planetly.me
 ===========
 
-This repo contains all of the specific components for the planetly.me website. The components are:
+planetly.me runs on nginx, uwsgi and python flask. The main directory is:
+/srv/http/planetly.me
 
-1. nginx server config
-2. uwsgi vassal
-3. Python Flask wsgi Instance
+http group should have rwx to that dir. There is a virtual environment, the files of which are in venv/
 
-/etc/nginx/nginx.conf and /etc/uwsgi/emperor.ini must be configured beforehand to include site confs
-in /etc/nginx/sites-enabled and vassal ini's in /etc/uwsgi/vassals, respectively.
-
-config/
-    |
-    -- *nginx.conf* - nginx config of the upstream context defining the unix socket to use for communication 
-    |   between uwsgi and nginx, as well as the server context which defines how to route requests to planetly.me/\* 
-    |   on port 80.
-    |   + symlink: /etc/nginx/sites-enabled/planetly.conf
-    |
-    -- *planetly.ini* - The uwsgi 'vassal' telling uwsgi to route requests to the Python Flask wsgi instance
-    |   + symlink: /etc/uwsgi/vassals/planetly.ini
-    |
-    -- *emperor.uwsgi.service* - Systemd unit for starting the uwsgi emperor
-        + symlink: /etc/systemd/system/emperor.uwsgi.service
-
-
+run.py <- wsgi entry point for the Flask app
+venv/bin/uwsgi --ini config/uwsgi.ini <- command to start the uwsgi server. It creates a socket in /tmp/uwsgi.sock
+and chmods it to 666 so that nginx can read/write it. I spent all day trying to get the fucking socket to work. 
